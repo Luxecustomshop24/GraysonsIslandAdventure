@@ -1,0 +1,87 @@
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+int main() {
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Grayson's Island Adventure");
+
+    // Load textures
+    sf::Texture graysonTexture;
+    sf::Texture daddyTexture;
+    if (!graysonTexture.loadFromFile("grayson.png") || !daddyTexture.loadFromFile("daddy_lion.png")) {
+        cout << "Error loading textures" << endl;
+        return -1;
+    }
+
+    // Sprites
+    sf::Sprite graysonSprite;
+    graysonSprite.setTexture(graysonTexture);
+    graysonSprite.setPosition(150, 300);
+
+    sf::Sprite daddySprite;
+    daddySprite.setTexture(daddyTexture);
+    daddySprite.setPosition(450, 300);
+
+    // Font
+    sf::Font font;
+    if (!font.loadFromFile("OpenSans-Bold.ttf")) {
+        cout << "Error loading font" << endl;
+        return -1;
+    }
+
+    sf::Text question("What is 2 + 2?", font, 28);
+    question.setPosition(250, 50);
+    question.setFillColor(sf::Color::Black);
+
+    sf::Text option1("3", font, 24);
+    sf::Text option2("4", font, 24);
+    option1.setPosition(250, 100);
+    option2.setPosition(350, 100);
+    option1.setFillColor(sf::Color::Red);
+    option2.setFillColor(sf::Color::Green);
+
+    bool answered = false;
+    sf::Text result("", font, 28);
+    result.setPosition(200, 200);
+
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+
+            // Mouse click
+            if (event.type == sf::Event::MouseButtonPressed && !answered) {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+                if (option1.getGlobalBounds().contains((float)mousePos.x, (float)mousePos.y)) {
+                    result.setString("Oops! Try again.");
+                    result.setFillColor(sf::Color::Red);
+                    answered = true;
+                }
+
+                if (option2.getGlobalBounds().contains((float)mousePos.x, (float)mousePos.y)) {
+                    result.setString("Yay! Grayson claps!");
+                    result.setFillColor(sf::Color::Green);
+                    answered = true;
+                }
+            }
+        }
+
+        window.clear(sf::Color(200, 250, 255));  // Jungle-like background color
+        window.draw(graysonSprite);
+        window.draw(daddySprite);
+        window.draw(question);
+        window.draw(option1);
+        window.draw(option2);
+        if (answered) {
+            window.draw(result);
+        }
+        window.display();
+    }
+
+    return 0;
+}
